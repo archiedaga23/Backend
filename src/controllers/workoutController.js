@@ -10,6 +10,7 @@ const createNewWorkout = async (req, res) => {
         mode,
         equipment,
         exercises,
+        trainerTips
     }
 
     try {     
