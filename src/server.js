@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const express = require('express');
+const bodyParser = require('body-parser');
 const app = express();
 
 const url = 'mongodb://127.0.0.1:27017/training-application';
@@ -11,13 +12,14 @@ const db = mongoose.connection;
 mongoose.connect(url, { useNewUrlParser: true })
 
 db.once('open', _ => {
-    console.log(`Database connected: ${url}`);
+    console.log(`Database Connected`);
 })
 
 db.on('error', err => {
     console.error(`connecttion error ${err}`)
 })
 
+app.use(bodyParser.json());
 app.use('/api/v1/workouts', workoutRoute);
 
 app.listen(PORT, () => {
