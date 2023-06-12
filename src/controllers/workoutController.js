@@ -1,9 +1,73 @@
 const workoutService = require('../services/workoutSerivce');
 
+const getAllWorkouts = async (req, res) => {
+    try {
+        const allWorkouts = await workoutService.getAllWorkouts();
+ 
+        res
+          .status(200)
+          .send({ 
+            status: 'OK', 
+            data: allWorkouts 
+           });
+    } catch (error) {
+        res
+          .status(error?.status || 500)
+          .send({ 
+            status: `FAILED`,
+            data: {
+                error: error?.message || error
+            }
+          });
+    }
+}
+
+const getWorkoutById = async (req, res) => {
+    const { params: { workoutId } } = req;
+
+    if (!workoutId) {
+        res
+          .status(400)
+          .send({
+             status: `FAILED`,
+             message: `Params ID cannot be empty: ${workoutId}.`
+          });
+    }
+
+    try {
+        const workout = await workoutService.getWorkoutById(workoutId);
+        
+        res
+          .status(200)
+          .send({ 
+            status: `OK`, 
+            data: workout 
+          });
+    } catch (error) {
+        res
+         .status(error?.status || 500)
+         .send({ 
+            status: `FAILED`, 
+            data: {
+                error: error?.message || error
+            }
+         });
+    }
+}
+
 const createNewWorkout = async (req, res) => {
     const { body: { name, mode, equipment, exercises, trainerTips } } = req;
 
-    if (!name || !mode || !equipment || !exercises || !trainerTips) return;
+    if (!name || !mode || !equipment || !exercises || !trainerTips) {
+        res
+          .status(400)
+          .send({ 
+            status: 'FAILED', 
+            data: { 
+              error: 
+                'One of the following keys is missing or is empty in request body: name, mode, equipment, exercises, trainerTips' 
+            }})
+    }
 
     const newWorkout = { 
         name,
@@ -16,50 +80,35 @@ const createNewWorkout = async (req, res) => {
     try {     
         const newCreatedWorkout = await workoutService.createNewWorkout(newWorkout);
         
-        res.send({ status: 'OK', data: newCreatedWorkout });
-    } catch (err) {
-        res.send({ status: '400', data: 'Failed to create data' });
-    }
-}
-
-const getAllWorkouts = async (req, res) => {
-    try {
-        const allWorkouts = await workoutService.getAllWorkouts();
-        
-        res.send({ status: '200', data: allWorkouts });
-    } catch (err) {
-        res.send({ status: '400', data: 'Failed to get workouts'});
-    }
-}
-
-const getWorkoutById = async (req, res) => {
-    const { params: { workoutId } } = req;
-
-    try {
-        const workout = await workoutService.getWorkoutById(workoutId);
-        
-        res.status(200).send({ status: '200', data: workout });
-    } catch (err) {
-        res.status(500).send({ status: '400', data: 'Failed to get workout'});
-    }
-}
-
-const deleteWorkoutById = async (req, res) => {
-    const { params: { workoutId } } = req;
-
-    try {
-        const deletedWorkout = await workoutService.deleteWorkoutById(workoutId);
-
-        res.status(200).send({ status: 200, data: deletedWorkout })
-    } catch (err) {
-        res.status(500).send({ status: '400', data: 'Failed to delete workout'});
+        res
+          .status(201)
+          .send({ 
+            status: 'OK', 
+            data: newCreatedWorkout 
+          });
+    } catch (error) {
+        res
+          .status(error?.status || 500)
+          .send({ 
+            status: 'FAILED', 
+            data: {
+                error: error?.message || error
+            } 
+         });
     }
 }
 
 const updateWorkoutById = async (req, res) => {
     const { params: { workoutId }, body : { name, mode, equipment, exercises, trainerTips }  } = req;
     
-    if (!name || !mode || !equipment || !exercises || !trainerTips) return;
+    if (!name || !mode || !equipment || !exercises || !trainerTips || !workoutId) {
+        res
+          .status(400)
+          .send({
+            status: `FAILED`,
+            message: `One of the following keys is missing or is empty in request body: name, mode, equipment, exercises, trainerTips, workoutId`
+          })
+    }
 
     const currentWorkout = { 
         id: workoutId,
@@ -73,16 +122,64 @@ const updateWorkoutById = async (req, res) => {
     try {
         const updatedWorkout = await workoutService.updateWorkoutById(workoutId, currentWorkout)
 
-        res.status(200).send({ status: 200, data: updatedWorkout });
-    } catch (err) { 
-        res.status(500).send({ status: '400', data: 'Failed to update workout'});
+        res
+          .status(200)
+          .send({ 
+            status: 200, 
+            data: updatedWorkout 
+          });
+    } catch (error) { 
+        res
+          .status(error.status || 500)
+          .send({ 
+            status: `FAILED`, 
+            data: {
+                status: error?.status || 500,
+                message: error?.message || error
+            }
+           });  
+    }
+}
+
+const deleteWorkoutById = async (req, res) => {
+    const { params: { workoutId } } = req;
+
+    if (!workoutId) {
+        res
+          .status(400)
+          .send({
+            status: `FAILED`,
+            data: {
+                error: error?.message || error
+            }
+          });
+    }
+
+    try {
+        const deletedWorkout = await workoutService.deleteWorkoutById(workoutId);
+
+        res
+          .status(200)
+          .send({ 
+            status: 200, 
+            data: deletedWorkout 
+          })
+    } catch (error) {
+        res
+          .status(error?.status || 500)
+          .send({ 
+            status: `FAILED`, 
+            data: {
+                error: error?.message || error
+            }
+        });
     }
 }
 
 module.exports = {
-    createNewWorkout,
     getAllWorkouts,
     getWorkoutById,
-    deleteWorkoutById,
-    updateWorkoutById
+    createNewWorkout,
+    updateWorkoutById,
+    deleteWorkoutById
 }

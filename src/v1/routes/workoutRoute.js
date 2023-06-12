@@ -4,10 +4,10 @@ const router = express.Router();
 const workoutController = require('../../controllers/workoutController');
 
 router
-    .post('/', workoutController.createNewWorkout)
-    .get('/', workoutController.getAllWorkouts)
     .get('/:workoutId', workoutController.getWorkoutById)
-    .delete('/:workoutId',workoutController.deleteWorkoutById)
+    .get('/', workoutController.getAllWorkouts)
+    .post('/', workoutController.createNewWorkout)
     .put('/:workoutId', workoutController.updateWorkoutById)
+    .delete('/:workoutId',workoutController.deleteWorkoutById)
 
 module.exports = router;

@@ -9,15 +9,10 @@ const workoutRoute = require('./v1/routes/workoutRoute');
 const PORT = 3000;
 const db = mongoose.connection;
 
-mongoose.connect(url, { useNewUrlParser: true })
-
-db.once('open', _ => {
-    console.log(`Database Connected`);
-})
-
-db.on('error', err => {
-    console.error(`connecttion error ${err}`)
-})
+mongoose
+    .connect(url, { useNewUrlParser: true })
+    .then(() => console.log(`Database Connected`))
+    .catch(err => console.error(`Connecttion error: ${err}`))
 
 app.use(bodyParser.json());
 app.use('/api/v1/workouts', workoutRoute);
